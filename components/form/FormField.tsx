@@ -23,18 +23,13 @@ export function FormField({ label, required, error, children, hint }: Props) {
   return (
     <div className="mb-5">
       <label className={`field-label${required ? ' field-required' : ''}`}>{label}</label>
-      {/* Injecte la classe d'erreur sur l'input enfant si erreur présente */}
-      {error
-        ? React.Children.map(children, (child) =>
-            React.isValidElement(child)
-              ? React.cloneElement(child as React.ReactElement<{ className?: string }>, {
-                  className: [
-                    (child.props as { className?: string }).className ?? '',
-                    'border-red-300 focus:ring-red-200 focus:border-red-400',
-                  ].join(' ').trim(),
-                })
-              : child
-          )
+      {React.isValidElement(children)
+        ? React.cloneElement(children as React.ReactElement<{ className?: string }>, {
+            className: [
+              (children.props as { className?: string }).className ?? '',
+              error ? 'border-red-300 focus:ring-red-200 focus:border-red-400' : '',
+            ].join(' ').trim(),
+          })
         : children}
       {hint && !error && <p className="text-xs text-gray-400 mt-1 italic">{hint}</p>}
       {error && <p className="field-error">{error}</p>}
