@@ -2,9 +2,10 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync, unl
 import path from 'path'
 import { encrypt, decrypt } from './crypto'
 
-const DATA_DIR   = path.join(process.cwd(), 'data', 'submissions')
-const INDEX_FILE = path.join(process.cwd(), 'data', 'index.json')
-const ACCESS_LOG = path.join(process.cwd(), 'data', 'access.log')
+const BASE_DIR   = process.env.DATA_PATH ?? path.join(process.cwd(), 'data')
+const DATA_DIR   = path.join(BASE_DIR, 'submissions')
+const INDEX_FILE = path.join(BASE_DIR, 'index.json')
+const ACCESS_LOG = path.join(BASE_DIR, 'access.log')
 
 const RETENTION_DAYS = 30 // suppression automatique après 30 jours (RGPD)
 
