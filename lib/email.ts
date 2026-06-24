@@ -11,8 +11,8 @@ function createTransporter() {
     port: 465,
     secure: true,
     // Force IPv4 — Railway blocks IPv6 outbound connections
-    lookup: (hostname: string, options: dns.LookupOptions, callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
-      dns.lookup(hostname, { ...options, family: 4 }, callback)
+    lookup: (hostname: string, _options: dns.LookupOptions, callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
+      dns.lookup(hostname, { family: 4 }, callback as any)
     },
     auth: { user, pass },
   } as any)
