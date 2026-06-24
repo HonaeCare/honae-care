@@ -1,0 +1,134 @@
+'use client'
+import React from 'react'
+import { useFormContext } from 'react-hook-form'
+
+// Efface l'erreur d'un champ piloté manuellement (setError) dès que
+// l'utilisateur y répond — sinon l'erreur fantôme bloque la soumission
+function useClearFieldError(name?: string) {
+  const ctx = useFormContext()
+  return () => {
+    if (name && ctx) ctx.clearErrors(name as never)
+  }
+}
+
+interface Props {
+  label: React.ReactNode
+  required?: boolean
+  error?: string
+  children: React.ReactNode
+  hint?: string
+}
+
+export function FormField({ label, required, error, children, hint }: Props) {
+  return (
+    <div className="mb-5">
+      <label className={`field-label${required ? ' field-required' : ''}`}>{label}</label>
+      {/* Injecte la classe d'erreur sur l'input enfant si erreur présente */}
+      {error
+        ? React.Children.map(children, (child) =>
+            React.isValidElement(child)
+              ? React.cloneElement(child as React.ReactElement<{ className?: string }>, {
+                  className: [
+                    (child.props as { className?: string }).className ?? '',
+                    'border-red-300 focus:ring-red-200 focus:border-red-400',
+                  ].join(' ').trim(),
+                })
+              : child
+          )
+        : children}
+      {hint && !error && <p className="text-xs text-gray-400 mt-1 italic">{hint}</p>}
+      {error && <p className="field-error">{error}</p>}
+    </div>
+  )
+}
+
+interface RadioGroupProps {
+  name: string
+  options: { value: string; label: string }[]
+  value?: string
+  onChange: (val: string) => void
+  horizontal?: boolean
+}
+
+export function RadioGroup({ name, options, value, onChange, horizontal }: RadioGroupProps) {
+  const clearError = useClearFieldError(name)
+  return (
+    <div className={`flex ${horizontal ? 'flex-row flex-wrap gap-4' : 'flex-col gap-2'} mt-1.5`}>
+      {options.map((opt) => (
+        <label key={opt.value} className="radio-option text-sm text-gray-700">
+          <input
+            type="radio"
+            name={name}
+            value={opt.value}
+            checked={value === opt.value}
+            onChange={() => { clearError(); onChange(opt.value) }}
+          />
+          {opt.label}
+        </label>
+      ))}
+    </div>
+  )
+}
+
+interface CheckGroupProps {
+  name?: string
+  options: { value: string; label: string }[]
+  value?: string[]
+  onChange: (vals: string[]) => void
+  columns?: number
+}
+
+export function CheckGroup({ name, options, value = [], onChange, columns = 1 }: CheckGroupProps) {
+  const clearError = useClearFieldError(name)
+  const toggle = (v: string) => {
+    clearError()
+    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])
+  }
+  return (
+    <div
+      className="grid gap-2 mt-1.5"
+      style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
+    >
+      {options.map((opt) => (
+        <label key={opt.value} className="check-option text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={value.includes(opt.value)}
+            onChange={() => toggle(opt.value)}
+          />
+          {opt.label}
+        </label>
+      ))}
+    </div>
+  )
+}
+
+interface SliderProps {
+  min?: number
+  max?: number
+  value?: number
+  onChange: (val: number) => void
+  showValue?: boolean
+}
+
+export function SliderField({ min = 0, max = 10, value = 5, onChange, showValue = true }: SliderProps) {
+  return (
+    <div className="flex items-center gap-3 mt-2">
+      <span className="text-xs text-gray-400 w-4 text-center">{min}</span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="slider-input flex-1"
+      />
+      <span className="text-xs text-gray-400 w-4 text-center">{max}</span>
+      {showValue && (
+        <span className="ml-1 w-9 text-center text-sm font-bold text-wine bg-rose/40 rounded-md px-1 py-0.5">
+          {value}
+        </span>
+      )}
+    </div>
+  )
+}
