@@ -7,8 +7,8 @@ function createTransporter() {
 
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // STARTTLS — le certificat Gmail est vérifié normalement
+    port: 465,
+    secure: true,
     auth: { user, pass },
   })
 }
