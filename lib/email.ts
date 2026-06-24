@@ -1,9 +1,6 @@
 import nodemailer from 'nodemailer'
 import dns from 'dns'
 
-// Railway blocks IPv6 — force all DNS lookups to return IPv4 first
-dns.setDefaultResultOrder('ipv4first')
-
 function createTransporter() {
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
@@ -13,7 +10,10 @@ function createTransporter() {
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
-    family: 4,
+    // Force IPv4 — Railway blocks IPv6 outbound connections
+    lookup: (hostname: string, options: dns.LookupOptions, callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
+      dns.lookup(hostname, { ...options, family: 4 }, callback)
+    },
     auth: { user, pass },
   } as any)
 }
