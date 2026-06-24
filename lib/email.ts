@@ -1,31 +1,4 @@
-import nodemailer from 'nodemailer'
-import { lookup } from 'dns/promises'
-
-// Railway blocks IPv6 — resolve smtp.gmail.com to IPv4 before connecting,
-// then pass the resolved address directly so tls.connect never does its own lookup.
-async function resolveIPv4(hostname: string): Promise<string> {
-  const result = await lookup(hostname, { family: 4 })
-  return result.address
-}
-
-async function createTransporter() {
-  const user = process.env.SMTP_USER
-  const pass = process.env.SMTP_PASS
-  if (!user || !pass) throw new Error('SMTP_USER ou SMTP_PASS manquant dans les variables d\'environnement')
-
-  const ip = await resolveIPv4('smtp.gmail.com')
-
-  return nodemailer.createTransport({
-    host: ip,
-    port: 465,
-    secure: true,
-    tls: {
-      // Keep SNI so Gmail's TLS certificate is validated against the correct hostname
-      servername: 'smtp.gmail.com',
-    },
-    auth: { user, pass },
-  })
-}
+import { Resend } from 'resend'
 
 // Échappe les caractères HTML — le prénom vient du formulaire patient
 function escapeHtml(s: string): string {
@@ -45,17 +18,20 @@ export async function sendNewFormNotification(
   patientPrenom: string,
   patientNom: string,
 ): Promise<void> {
-  const user = process.env.SMTP_USER
-  const recipient = process.env.SMTP_RECIPIENT ?? user
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) throw new Error('RESEND_API_KEY manquant dans les variables d\'environnement')
+
+  const recipient = process.env.SMTP_RECIPIENT
   if (!recipient) throw new Error('Destinataire email non configuré')
 
   const adminUrl = `${process.env.BASE_URL ?? 'https://formulaire.honaecare.com'}/admin`
   const prenomSafe = escapeHtml(patientPrenom.slice(0, 60))
   const initial = escapeHtml(patientNom.charAt(0).toUpperCase())
-  const transporter = await createTransporter()
 
-  const info = await transporter.sendMail({
-    from: `"Honae Care" <${user}>`,
+  const resend = new Resend(apiKey)
+
+  await resend.emails.send({
+    from: 'Honae Care <secretariat@honae-care.com>',
     to: recipient,
     subject: `Nouveau formulaire — ${patientPrenom.slice(0, 60).replace(/[\r\n]/g, ' ')} ${patientNom.charAt(0).toUpperCase()}.`,
     html: `
@@ -86,8 +62,4 @@ export async function sendNewFormNotification(
       </html>
     `,
   })
-
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[email] ✓ Envoyé à ${recipient} — messageId: ${info.messageId}`)
-  }
 }
