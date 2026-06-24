@@ -1,4 +1,8 @@
 import nodemailer from 'nodemailer'
+import dns from 'dns'
+
+// Railway blocks IPv6 — force all DNS lookups to return IPv4 first
+dns.setDefaultResultOrder('ipv4first')
 
 function createTransporter() {
   const user = process.env.SMTP_USER
