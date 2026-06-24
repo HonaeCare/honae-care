@@ -1,21 +1,30 @@
 import nodemailer from 'nodemailer'
-import dns from 'dns'
+import { lookup } from 'dns/promises'
 
-function createTransporter() {
+// Railway blocks IPv6 — resolve smtp.gmail.com to IPv4 before connecting,
+// then pass the resolved address directly so tls.connect never does its own lookup.
+async function resolveIPv4(hostname: string): Promise<string> {
+  const result = await lookup(hostname, { family: 4 })
+  return result.address
+}
+
+async function createTransporter() {
   const user = process.env.SMTP_USER
   const pass = process.env.SMTP_PASS
   if (!user || !pass) throw new Error('SMTP_USER ou SMTP_PASS manquant dans les variables d\'environnement')
 
+  const ip = await resolveIPv4('smtp.gmail.com')
+
   return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
+    host: ip,
     port: 465,
     secure: true,
-    // Force IPv4 — Railway blocks IPv6 outbound connections
-    lookup: (hostname: string, _options: dns.LookupOptions, callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void) => {
-      dns.lookup(hostname, { family: 4 }, callback as any)
+    tls: {
+      // Keep SNI so Gmail's TLS certificate is validated against the correct hostname
+      servername: 'smtp.gmail.com',
     },
     auth: { user, pass },
-  } as any)
+  })
 }
 
 // Échappe les caractères HTML — le prénom vient du formulaire patient
@@ -43,7 +52,7 @@ export async function sendNewFormNotification(
   const adminUrl = `${process.env.BASE_URL ?? 'https://formulaire.honaecare.com'}/admin`
   const prenomSafe = escapeHtml(patientPrenom.slice(0, 60))
   const initial = escapeHtml(patientNom.charAt(0).toUpperCase())
-  const transporter = createTransporter()
+  const transporter = await createTransporter()
 
   const info = await transporter.sendMail({
     from: `"Honae Care" <${user}>`,
