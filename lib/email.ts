@@ -11,7 +11,7 @@ function createTransporter() {
     secure: true,
     family: 4,
     auth: { user, pass },
-  })
+  } as any)
 }
 
 // Échappe les caractères HTML — le prénom vient du formulaire patient
