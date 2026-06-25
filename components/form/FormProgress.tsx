@@ -33,9 +33,10 @@ export default function FormProgress({ currentStep, totalSteps, showStep5, onSte
         <img
           src="/Honae_Lie De Vin.png"
           alt="Honae"
-          className="h-10 w-auto mx-auto mb-3"
+          className="h-10 w-auto mx-auto mb-2"
         />
-        <p className="text-sm font-semibold tracking-[0.25em] text-wine uppercase">
+        <p className="text-xl font-semibold text-gray-800">Honae Care</p>
+        <p className="text-sm font-semibold tracking-[0.25em] text-wine uppercase mt-1">
           Maison de fertilité
         </p>
       </div>
