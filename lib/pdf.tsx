@@ -114,9 +114,8 @@ const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.headerSubtitle}>MAISON DE FERTILITÉ</Text>
           <Text style={styles.logo}>Honae Care</Text>
-          <View style={styles.accentBar} />
+          <Text style={styles.headerSubtitle}>MAISON DE FERTILITÉ</Text>
         </View>
         <View style={styles.headerInfo}>
           <Text>Formulaire d&apos;anamnèse fertilité</Text>
