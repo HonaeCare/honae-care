@@ -59,17 +59,19 @@ export default function Step2() {
         />
       </FormField>
 
-      <FormField label="Souhait de préservation de la fertilité ?" required error={(errors.step2 as any)?.souhaitPreservation?.message}>
-        <RadioGroup
-          name="step2.souhaitPreservation"
-          options={OUI_NON_DISCUTER}
-          value={preservation}
-          onChange={(v) => setValue('step2.souhaitPreservation', v)}
-          horizontal
-        />
-      </FormField>
+      {motif !== 'préservation' && (
+        <FormField label="Souhait de préservation de la fertilité ?" required error={(errors.step2 as any)?.souhaitPreservation?.message}>
+          <RadioGroup
+            name="step2.souhaitPreservation"
+            options={OUI_NON_DISCUTER}
+            value={preservation}
+            onChange={(v) => setValue('step2.souhaitPreservation', v)}
+            horizontal
+          />
+        </FormField>
+      )}
 
-      {preservation === 'oui' && (
+      {(motif === 'préservation' || preservation === 'oui') && (
         <div className="bg-rose/20 rounded-xl p-4 mb-4 border border-rose/40 grid sm:grid-cols-2 gap-4">
           <FormField label="Conservation ovocytaire">
             <RadioGroup

@@ -159,7 +159,7 @@ export default function FormContainer() {
         methods.setError('step2.bilanFertilite' as any, { type: 'required', message: 'Requis' })
         radioValid = false
       }
-      if (!v.step2?.souhaitPreservation) {
+      if (v.step2?.motifPrincipal !== 'préservation' && !v.step2?.souhaitPreservation) {
         methods.setError('step2.souhaitPreservation' as any, { type: 'required', message: 'Requis' })
         radioValid = false
       }
