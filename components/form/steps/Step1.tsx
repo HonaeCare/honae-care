@@ -25,9 +25,7 @@ export default function Step1() {
     <div>
       <h2 className="text-lg font-semibold text-wine mb-6">Informations personnelles</h2>
 
-      <FormField label="Date du formulaire" required error={(errors.step1 as any)?.dateFormulaire?.message}>
-        <input type="date" className="field-input" {...register('step1.dateFormulaire', { required: 'Requis' })} />
-      </FormField>
+      <input type="hidden" {...register('step1.dateFormulaire')} />
 
       <FormField label="Formulaire complété par" required error={(errors.step1 as any)?.completePar?.message}>
         <RadioGroup
