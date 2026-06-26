@@ -75,7 +75,7 @@ export default function Step3() {
         )}
       </FormField>
 
-      <FormField label="Phase lutéale estimée" hint="en jours (facultatif)">
+      <FormField label="Phase lutéale (post-ovulation jusqu'au premier jour des règles)" hint="en jours (facultatif)">
         <input type="number" min={7} max={20} className="field-input" {...register('step3.phaseLuteale', { valueAsNumber: true })} />
       </FormField>
 
