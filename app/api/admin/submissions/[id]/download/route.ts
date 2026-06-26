@@ -25,7 +25,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const pdfBuffer = getSubmission(id) // valide l'UUID en interne
-    const filename = `Anamnese_${safeFilePart(meta.prenom)}_${safeFilePart(meta.nom)}_${meta.date.slice(0, 10).replace(/-/g, '')}.pdf`
+    const dateFormatted = meta.date.slice(0, 10).split('-').reverse().join('.')
+    const filename = `HC Anamnèse Fertilité ${safeFilePart(meta.nom)} ${safeFilePart(meta.prenom)} ${dateFormatted}.pdf`
 
     // Log sans données patient (RGPD — pseudonymisation par ID)
     logAccess(`DOWNLOAD id=${id}`)

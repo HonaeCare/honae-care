@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headerLeft: { flexDirection: 'column' },
-  headerSubtitle: { fontSize: 7, color: WINE, letterSpacing: 1.5, marginBottom: 2 },
+  headerSubtitle: { fontSize: 7, color: WINE, letterSpacing: 1.5, marginBottom: 2, marginTop: 4 },
   logo: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: WINE },
   headerInfo: { textAlign: 'right', fontSize: 7.5, color: '#888' },
   sectionTitle: {
