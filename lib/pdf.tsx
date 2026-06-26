@@ -108,6 +108,13 @@ const BlockField = ({ label, value }: { label: string; value?: string | null }) 
 
 const arrToStr = (arr?: string[] | null) => arr?.filter(Boolean).join(', ') || null
 
+// Convertit YYYY-MM-DD ou DD/MM/YYYY en format belge JJ/MM/AAAA
+const fmtDate = (d?: string | null): string | null => {
+  if (!d) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d.split('-').reverse().join('/')
+  return d
+}
+
 const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
   <Document>
     <Page size="A4" style={styles.page}>
@@ -126,11 +133,11 @@ const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
 
       {/* Étape 1 */}
       <Text style={styles.sectionTitle}>1 — Informations personnelles</Text>
-      <Field label="Date formulaire" value={data.step1?.dateFormulaire} />
+      <Field label="Date formulaire" value={fmtDate(data.step1?.dateFormulaire)} />
       <Field label="Complété par" value={data.step1?.completePar} />
       {data.step1?.completeParAutre && <Field label="Complété par (précision)" value={data.step1.completeParAutre} />}
       <Field label="Prénom / Nom" value={`${data.step1?.prenom ?? ''} ${data.step1?.nom ?? ''}`} />
-      <Field label="Date de naissance" value={data.step1?.dateNaissance} />
+      <Field label="Date de naissance" value={fmtDate(data.step1?.dateNaissance)} />
       <Field label="Adresse" value={data.step1?.adresse} />
       <Field label="Téléphone" value={data.step1?.telephone} />
       <Field label="Email" value={data.step1?.email} />
@@ -200,7 +207,7 @@ const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
       <Field label="Troubles digestifs/pelviens" value={data.step3?.troublesDigestifs} />
       <Field label="Type contraception" value={arrToStr(data.step3?.typeContraception)} />
       <Field label="Marque contraception" value={data.step3?.marqueContraception} />
-      <Field label="Date arrêt contraception hormonale" value={data.step3?.dateArretContraception} />
+      <Field label="Date arrêt contraception hormonale" value={fmtDate(data.step3?.dateArretContraception)} />
       <Field label="Effets secondaires contraception" value={data.step3?.effetsSecondairesContraception} />
       <Field label="Acné résistante" value={data.step3?.acne} />
       <Field label="Pilosité excessive" value={data.step3?.pilosite} />
@@ -243,7 +250,7 @@ const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
           <Field label="Échographie génito-urinaire" value={data.step5?.echoGenitourinaire} />
           <Field label="Caryotype" value={data.step5?.caryotype} />
           <Field label="Autres examens" value={data.step5?.autresExamensMasculins} />
-          <Field label="Dernier frottis date" value={data.step5?.dernierFrottisDate} />
+          <Field label="Dernier frottis date" value={fmtDate(data.step5?.dernierFrottisDate)} />
           <Field label="Dernier frottis résultat" value={data.step5?.dernierFrottisResultat} />
           <Field label="Chute de cheveux" value={data.step5?.chutCheveux} />
         </>
@@ -298,7 +305,7 @@ const AnamnesePDF = ({ data, date }: { data: FormData; date: string }) => (
         <Field label="Partage praticiens Honae" value={data.step8?.partageHonae} />
         <Field label="Partage partenaire" value={data.step8?.partagePartenaire} />
         <Field label="Signature électronique" value={data.step8?.signature} />
-        <Field label="Date signature" value={data.step8?.dateSignature} />
+        <Field label="Date signature" value={fmtDate(data.step8?.dateSignature)} />
       </View>
 
       {/* Footer */}
