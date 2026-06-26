@@ -105,7 +105,7 @@ export default function Step2() {
         )}
       </FormField>
 
-      <FormField label="Rapports ciblés sur la période fertile ?">
+      <FormField label="Rapports sexuels ciblés sur la période fertile ?">
         <RadioGroup
           name="step2.rapportsCibles"
           options={[
