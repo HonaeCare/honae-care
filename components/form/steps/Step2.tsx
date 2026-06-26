@@ -226,7 +226,7 @@ export default function Step2() {
         />
       </FormField>
 
-      <FormField label="Sérologies connues si antérieur">
+      <FormField label="Sérologies connues si antérieures">
         <CheckGroup
           options={[
             { value: 'VIH', label: 'VIH' },
