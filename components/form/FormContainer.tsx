@@ -187,7 +187,7 @@ export default function FormContainer() {
   const next = useCallback(async () => {
     if (await validateStep(currentStep)) {
       setCurrentStep((s) => Math.min(s + 1, totalSteps))
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0
     } else {
       scrollToFirstError()
     }
@@ -195,7 +195,7 @@ export default function FormContainer() {
 
   const prev = useCallback(() => {
     setCurrentStep((s) => Math.max(s - 1, 1))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0
   }, [])
 
   // Navigation via la timeline : reculer est libre, avancer valide chaque
@@ -203,7 +203,7 @@ export default function FormContainer() {
   const goToStep = useCallback(async (target: number) => {
     if (target <= currentStep) {
       setCurrentStep(target)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0
       return
     }
     for (let step = currentStep; step < target; step++) {
@@ -214,7 +214,7 @@ export default function FormContainer() {
       }
     }
     setCurrentStep(target)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0
   }, [currentStep, validateStep])
 
   // Étape d'affichage correspondant à un nom de champ (ex : 'step1.email' → 1).
