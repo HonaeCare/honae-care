@@ -1,7 +1,7 @@
 'use client'
 import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { FormField, RadioGroup, CheckGroup } from '../FormField'
+import { FormField, RadioGroup, CheckGroup, DateSelectInput } from '../FormField'
 import type { FormData } from '@/lib/types'
 
 export default function Step1() {
@@ -57,7 +57,10 @@ export default function Step1() {
       </div>
 
       <FormField label="Date de naissance" required error={(errors.step1 as any)?.dateNaissance?.message}>
-        <input type="date" className="field-input" {...register('step1.dateNaissance', { required: 'Requis' })} />
+        <DateSelectInput
+          onChange={val => setValue('step1.dateNaissance', val, { shouldValidate: true })}
+        />
+        <input type="hidden" {...register('step1.dateNaissance', { required: 'Requis' })} />
       </FormField>
 
       <FormField label="Adresse postale" required error={(errors.step1 as any)?.adresse?.message}>

@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useRef } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 // Efface l'erreur d'un champ piloté manuellement (setError) dès que
@@ -124,6 +124,40 @@ export function SliderField({ min = 0, max = 10, value = 5, onChange, showValue 
           {value}
         </span>
       )}
+    </div>
+  )
+}
+
+const MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+const CURRENT_YEAR = new Date().getFullYear()
+
+export function DateSelectInput({ onChange }: { onChange: (val: string) => void }) {
+  const parts = useRef({ d: '', m: '', y: '' })
+  const update = (key: 'd' | 'm' | 'y', val: string) => {
+    parts.current[key] = val
+    const { d, m, y } = parts.current
+    if (d && m && y) onChange(`${y}-${m}-${d}`)
+  }
+  return (
+    <div className="flex gap-2 mt-1">
+      <select className="field-input flex-1" defaultValue="" onChange={e => update('d', e.target.value)}>
+        <option value="" disabled>Jour</option>
+        {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+          <option key={d} value={String(d).padStart(2, '0')}>{d}</option>
+        ))}
+      </select>
+      <select className="field-input flex-1" defaultValue="" onChange={e => update('m', e.target.value)}>
+        <option value="" disabled>Mois</option>
+        {MOIS.map((m, i) => (
+          <option key={m} value={String(i + 1).padStart(2, '0')}>{m}</option>
+        ))}
+      </select>
+      <select className="field-input flex-[1.4]" defaultValue="" onChange={e => update('y', e.target.value)}>
+        <option value="" disabled>Année</option>
+        {Array.from({ length: 100 }, (_, i) => CURRENT_YEAR - 10 - i).map(y => (
+          <option key={y} value={y}>{y}</option>
+        ))}
+      </select>
     </div>
   )
 }
