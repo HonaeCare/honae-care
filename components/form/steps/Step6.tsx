@@ -102,7 +102,7 @@ export default function Step6() {
           <input className="field-input mt-2" placeholder="Date d'arrêt" {...register('step6.dateArretTabac')} />
         )}
         {tabac === 'oui' && (
-          <input type="number" className="field-input mt-2" placeholder="Nombre de cigarettes par jour" {...register('step6.nbCigarettes', { valueAsNumber: true })} />
+          <input type="number" min={0} max={100} className="field-input mt-2" placeholder="Nombre de cigarettes par jour" {...register('step6.nbCigarettes', { valueAsNumber: true })} />
         )}
       </FormField>
 

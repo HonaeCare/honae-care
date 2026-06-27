@@ -134,7 +134,14 @@ export default function Step1() {
               )}
             </FormField>
             <FormField label="Âge" hint="Facultatif">
-              <input type="number" className="field-input" {...register('step1.partenaireAge')} />
+              <input
+                type="number"
+                min={0}
+                max={120}
+                onKeyDown={(e) => { if (['-', '+', 'e', 'E'].includes(e.key)) e.preventDefault() }}
+                className="field-input"
+                {...register('step1.partenaireAge')}
+              />
             </FormField>
             <FormField label="Prénom" required error={(errors.step1 as any)?.partenairePrenom?.message}>
               <input className="field-input" {...register('step1.partenairePrenom', { required: 'Requis' })} />
