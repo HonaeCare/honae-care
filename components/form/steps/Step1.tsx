@@ -56,6 +56,7 @@ export default function Step1() {
 
       <FormField label="Date de naissance" required error={(errors.step1 as any)?.dateNaissance?.message}>
         <DateSelectInput
+          value={watch('step1.dateNaissance')}
           onChange={val => setValue('step1.dateNaissance', val, { shouldValidate: true })}
         />
         <input type="hidden" {...register('step1.dateNaissance', { required: 'Requis' })} />
