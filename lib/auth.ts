@@ -3,53 +3,64 @@ import jwt from 'jsonwebtoken'
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import path from 'path'
 
-const DATA_DIR = path.join(process.cwd(), 'data')
-const RATE_LIMIT_FILE = path.join(DATA_DIR, 'rate-limit.json')
+// État stocké sur le volume persistant (survit aux redéploiements Railway)
+const DATA_DIR = process.env.DATA_PATH ?? path.join(process.cwd(), 'data')
+const GUARD_FILE = path.join(DATA_DIR, 'login-guard.json')
 
 function ensureDataDir() {
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true })
 }
-const MAX_ATTEMPTS = 5
-const BLOCK_MS = 15 * 60 * 1000
 
-interface RateLimitState {
-  attempts: number
-  blockedUntil: number | null
+// ── Garde-fou GLOBAL anti-brute-force ──────────────────────────────────────
+// Indépendant de l'IP : compte tous les échecs de connexion sur une fenêtre
+// glissante. Plus il y a d'échecs récents, plus chaque tentative (même
+// distribuée via un botnet) est ralentie. Aucun verrouillage dur — le bon mot
+// de passe finit toujours par passer, donc pas de déni de service possible
+// contre le secrétariat.
+const WINDOW_MS = 15 * 60 * 1000   // fenêtre glissante de 15 min
+const FREE_ATTEMPTS = 5            // échecs tolérés sans pénalité
+const STEP_MS = 750               // pénalité ajoutée par échec au-delà du seuil
+const MAX_DELAY_MS = 10_000        // plafond du délai imposé
+
+interface GuardState {
+  failures: number
+  windowStart: number
 }
 
-function readState(): RateLimitState {
-  if (!existsSync(RATE_LIMIT_FILE)) return { attempts: 0, blockedUntil: null }
-  try { return JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf8')) } catch { return { attempts: 0, blockedUntil: null } }
-}
-
-function saveState(s: RateLimitState) {
-  ensureDataDir()
-  writeFileSync(RATE_LIMIT_FILE, JSON.stringify(s), 'utf8')
-}
-
-export function checkRateLimit(): { allowed: boolean; remainingMs?: number } {
-  const s = readState()
-  if (s.blockedUntil && Date.now() < s.blockedUntil) {
-    return { allowed: false, remainingMs: s.blockedUntil - Date.now() }
-  }
-  if (s.blockedUntil && Date.now() >= s.blockedUntil) {
-    saveState({ attempts: 0, blockedUntil: null })
-  }
-  return { allowed: true }
-}
-
-export function recordFailedAttempt() {
-  const s = readState()
-  const attempts = (s.attempts || 0) + 1
-  if (attempts >= MAX_ATTEMPTS) {
-    saveState({ attempts, blockedUntil: Date.now() + BLOCK_MS })
-  } else {
-    saveState({ attempts, blockedUntil: null })
+function readGuard(): GuardState {
+  if (!existsSync(GUARD_FILE)) return { failures: 0, windowStart: Date.now() }
+  try {
+    const s = JSON.parse(readFileSync(GUARD_FILE, 'utf8')) as GuardState
+    if (Date.now() - s.windowStart > WINDOW_MS) return { failures: 0, windowStart: Date.now() }
+    return s
+  } catch {
+    return { failures: 0, windowStart: Date.now() }
   }
 }
 
-export function resetAttempts() {
-  saveState({ attempts: 0, blockedUntil: null })
+function writeGuard(s: GuardState) {
+  try {
+    ensureDataDir()
+    writeFileSync(GUARD_FILE, JSON.stringify(s), 'utf8')
+  } catch { /* non bloquant */ }
+}
+
+/** Délai (ms) à imposer AVANT de vérifier le mot de passe, selon les échecs récents. */
+export function globalLoginDelayMs(): number {
+  const { failures } = readGuard()
+  const over = Math.max(0, failures - FREE_ATTEMPTS)
+  return Math.min(over * STEP_MS, MAX_DELAY_MS)
+}
+
+/** À appeler après un échec de connexion. */
+export function recordFailedLogin() {
+  const s = readGuard()
+  writeGuard({ failures: s.failures + 1, windowStart: s.windowStart })
+}
+
+/** À appeler après une connexion réussie — remet le compteur à zéro. */
+export function resetLoginGuard() {
+  writeGuard({ failures: 0, windowStart: Date.now() })
 }
 
 export async function verifyPassword(password: string): Promise<boolean> {

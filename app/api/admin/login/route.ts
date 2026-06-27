@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { verifyPassword, signToken } from '@/lib/auth'
+import { verifyPassword, signToken, globalLoginDelayMs, recordFailedLogin, resetLoginGuard } from '@/lib/auth'
 import { rateLimit } from '@/lib/rate-limit'
 import { logAccess } from '@/lib/storage'
 
@@ -33,14 +33,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Mot de passe requis' }, { status: 400 })
     }
 
+    // ── 2. Garde-fou GLOBAL anti-brute-force (toutes IP confondues) ──
+    // Plus il y a eu d'échecs récents, plus chaque tentative est ralentie —
+    // neutralise les attaques distribuées par IP tournantes.
+    const globalDelay = globalLoginDelayMs()
+    if (globalDelay > 0) await new Promise((r) => setTimeout(r, globalDelay))
+
     const ok = await verifyPassword(password)
 
     if (!ok) {
+      recordFailedLogin()
       // Délai artificiel pour ralentir les attaques automatisées
       await new Promise((r) => setTimeout(r, 1000 + Math.random() * 500))
       logAccess(`LOGIN_FAILED:${ip}`)
       return NextResponse.json({ error: 'Mot de passe incorrect' }, { status: 401 })
     }
+    resetLoginGuard()
     const token = signToken()
     logAccess(`LOGIN_SUCCESS:${ip}`)
 
