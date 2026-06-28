@@ -17,7 +17,9 @@ function escapeHtml(s: string): string {
 export async function sendNewFormNotification(
   patientPrenom: string,
   patientNom: string,
+  formLabel: string = 'Fertilité',
 ): Promise<void> {
+  const typeSafe = escapeHtml(formLabel.slice(0, 30))
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) throw new Error('RESEND_API_KEY manquant dans les variables d\'environnement')
 
@@ -33,7 +35,7 @@ export async function sendNewFormNotification(
   await resend.emails.send({
     from: 'Honae Care <secretariat@honae-care.com>',
     to: recipient,
-    subject: `Nouveau formulaire — ${patientPrenom.slice(0, 60).replace(/[\r\n]/g, ' ')} ${patientNom.charAt(0).toUpperCase()}.`,
+    subject: `Nouveau formulaire ${formLabel.slice(0, 30).replace(/[\r\n]/g, ' ')} — ${patientPrenom.slice(0, 60).replace(/[\r\n]/g, ' ')} ${patientNom.charAt(0).toUpperCase()}.`,
     html: `
       <!DOCTYPE html>
       <html lang="fr">
@@ -44,7 +46,7 @@ export async function sendNewFormNotification(
             <h1 style="margin:4px 0 0;font-size:22px;color:#fff;font-weight:300;">Honae Care</h1>
           </div>
           <div style="padding:32px;">
-            <p style="margin:0 0 8px;font-size:14px;color:#666;">Nouveau formulaire d'anamnèse reçu</p>
+            <p style="margin:0 0 8px;font-size:14px;color:#666;">Nouveau formulaire d'anamnèse <strong>${typeSafe}</strong> reçu</p>
             <p style="margin:0 0 24px;font-size:20px;font-weight:600;color:#5B1820;">${prenomSafe} ${initial}.</p>
             <a href="${adminUrl}"
                style="display:inline-block;background:#5B1820;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;">

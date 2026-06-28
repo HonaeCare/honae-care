@@ -113,7 +113,18 @@ export default function AdminDashboard() {
                   const days = daysUntilExpiry(s.date)
                   return (
                     <tr key={s.id} className={`border-t border-gray-50 hover:bg-ecru transition-colors ${i % 2 === 0 ? '' : 'bg-ecru/50'}`}>
-                      <td className="px-5 py-3.5 font-medium text-gray-800">{s.prenom} {s.nom}</td>
+                      <td className="px-5 py-3.5 font-medium text-gray-800">
+                        <span className="flex items-center gap-2 flex-wrap">
+                          {s.prenom} {s.nom}
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            s.formType === 'menopause'
+                              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                              : 'bg-rose/30 text-wine border border-rose'
+                          }`}>
+                            {s.formType === 'menopause' ? 'Ménopause' : 'Fertilité'}
+                          </span>
+                        </span>
+                      </td>
                       <td className="px-5 py-3.5 text-gray-500 hidden sm:table-cell">{formatDate(s.date)}</td>
                       <td className="px-5 py-3.5 hidden md:table-cell">
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${

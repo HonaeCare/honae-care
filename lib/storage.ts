@@ -20,12 +20,15 @@ function ensureDir() {
   if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true })
 }
 
+export type FormType = 'fertilite' | 'menopause'
+
 export interface SubmissionMeta {
   id: string
   nom: string
   prenom: string
   date: string
   size: number
+  formType?: FormType // absent = ancien dossier fertilité (rétrocompatibilité)
 }
 
 function readIndex(): SubmissionMeta[] {
@@ -38,13 +41,13 @@ function writeIndex(index: SubmissionMeta[]) {
   writeFileSync(INDEX_FILE, JSON.stringify(index, null, 2), 'utf8')
 }
 
-export function saveSubmission(id: string, nom: string, prenom: string, pdfBuffer: Buffer): void {
+export function saveSubmission(id: string, nom: string, prenom: string, pdfBuffer: Buffer, formType: FormType = 'fertilite'): void {
   assertValidId(id)
   ensureDir()
   const encrypted = encrypt(pdfBuffer)
   writeFileSync(path.join(DATA_DIR, `${id}.enc`), encrypted)
   const index = readIndex()
-  index.unshift({ id, nom, prenom, date: new Date().toISOString(), size: encrypted.length })
+  index.unshift({ id, nom, prenom, date: new Date().toISOString(), size: encrypted.length, formType })
   writeIndex(index)
 }
 
