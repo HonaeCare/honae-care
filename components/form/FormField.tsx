@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { useT } from '@/lib/i18n'
 
 // Efface l'erreur d'un champ piloté manuellement (setError) dès que
 // l'utilisateur y répond — sinon l'erreur fantôme bloque la soumission
@@ -128,13 +129,27 @@ export function SliderField({ min = 0, max = 10, value = 5, onChange, showValue 
   )
 }
 
-const MOIS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre']
+const MOIS_DICT = [
+  { fr: 'Janvier', en: 'January', nl: 'Januari' },
+  { fr: 'Février', en: 'February', nl: 'Februari' },
+  { fr: 'Mars', en: 'March', nl: 'Maart' },
+  { fr: 'Avril', en: 'April', nl: 'April' },
+  { fr: 'Mai', en: 'May', nl: 'Mei' },
+  { fr: 'Juin', en: 'June', nl: 'Juni' },
+  { fr: 'Juillet', en: 'July', nl: 'Juli' },
+  { fr: 'Août', en: 'August', nl: 'Augustus' },
+  { fr: 'Septembre', en: 'September', nl: 'September' },
+  { fr: 'Octobre', en: 'October', nl: 'Oktober' },
+  { fr: 'Novembre', en: 'November', nl: 'November' },
+  { fr: 'Décembre', en: 'December', nl: 'December' },
+]
 const CURRENT_YEAR = new Date().getFullYear()
 
 // Sélecteur de date contrôlé : reflète toujours la valeur réelle du formulaire
 // (brouillon restauré, retour sur une étape) et n'écrit une date qu'une fois
 // les trois champs renseignés — sinon le champ reste vide (erreur « Requis »).
 export function DateSelectInput({ value, onChange }: { value?: string; onChange: (val: string) => void }) {
+  const t = useT()
   const [yy, mm, dd] = /^\d{4}-\d{2}-\d{2}$/.test(value ?? '')
     ? (value as string).split('-')
     : ['', '', '']
@@ -149,19 +164,19 @@ export function DateSelectInput({ value, onChange }: { value?: string; onChange:
   return (
     <div className="flex gap-2 mt-1">
       <select className="field-input flex-1" value={parts.d} onChange={e => update('d', e.target.value)}>
-        <option value="" disabled>Jour</option>
+        <option value="" disabled>{t({ fr: 'Jour', en: 'Day', nl: 'Dag' })}</option>
         {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
           <option key={d} value={String(d).padStart(2, '0')}>{d}</option>
         ))}
       </select>
       <select className="field-input flex-1" value={parts.m} onChange={e => update('m', e.target.value)}>
-        <option value="" disabled>Mois</option>
-        {MOIS.map((m, i) => (
-          <option key={m} value={String(i + 1).padStart(2, '0')}>{m}</option>
+        <option value="" disabled>{t({ fr: 'Mois', en: 'Month', nl: 'Maand' })}</option>
+        {MOIS_DICT.map((m, i) => (
+          <option key={i} value={String(i + 1).padStart(2, '0')}>{t(m)}</option>
         ))}
       </select>
       <select className="field-input flex-[1.4]" value={parts.y} onChange={e => update('y', e.target.value)}>
-        <option value="" disabled>Année</option>
+        <option value="" disabled>{t({ fr: 'Année', en: 'Year', nl: 'Jaar' })}</option>
         {Array.from({ length: 100 }, (_, i) => CURRENT_YEAR - 10 - i).map(y => (
           <option key={y} value={String(y)}>{y}</option>
         ))}

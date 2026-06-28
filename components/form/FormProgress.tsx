@@ -1,15 +1,18 @@
 'use client'
+import { useT } from '@/lib/i18n'
+import type { Dict } from '@/lib/i18n'
+import LanguageSwitcher from './LanguageSwitcher'
 
-const STEP_LABELS = [
-  'Informations',
-  'Antécédents',
-  'Cycles',
-  'Obstétrique',
-  'Masculin',
-  'Mode de vie',
-  'Bien-être',
-  'Conclusion',
-  'Consentement',
+const STEP_LABELS: Dict[] = [
+  { fr: 'Informations', en: 'Information', nl: 'Informatie' },
+  { fr: 'Antécédents', en: 'History', nl: 'Voorgeschiedenis' },
+  { fr: 'Cycles', en: 'Cycles', nl: 'Cyclus' },
+  { fr: 'Obstétrique', en: 'Obstetrics', nl: 'Verloskunde' },
+  { fr: 'Masculin', en: 'Male', nl: 'Mannelijk' },
+  { fr: 'Mode de vie', en: 'Lifestyle', nl: 'Levensstijl' },
+  { fr: 'Bien-être', en: 'Well-being', nl: 'Welzijn' },
+  { fr: 'Conclusion', en: 'Conclusion', nl: 'Conclusie' },
+  { fr: 'Consentement', en: 'Consent', nl: 'Toestemming' },
 ]
 
 interface Props {
@@ -20,14 +23,19 @@ interface Props {
 }
 
 export default function FormProgress({ currentStep, totalSteps, showStep5, onStepClick }: Props) {
-  const labels = showStep5
+  const t = useT()
+  const labelsRaw = showStep5
     ? STEP_LABELS
     : STEP_LABELS.filter((_, i) => i !== 4)
+  const labels = labelsRaw.map((l) => t(l))
 
   const pct = Math.round(((currentStep - 1) / (totalSteps - 1)) * 100)
 
   return (
     <div className="mb-8">
+      {/* Sélecteur de langue */}
+      <LanguageSwitcher />
+
       {/* Logo + en-tête */}
       <div className="text-center mb-7">
         <img
@@ -36,14 +44,14 @@ export default function FormProgress({ currentStep, totalSteps, showStep5, onSte
           className="h-10 w-auto mx-auto mb-3"
         />
         <p className="text-sm font-semibold tracking-[0.25em] text-wine uppercase">
-          Maison de fertilité
+          {t({ fr: 'Maison de fertilité', en: 'Fertility House', nl: 'Fertiliteitshuis' })}
         </p>
       </div>
 
       {/* Étape + label */}
       <div className="flex justify-between items-center mb-2">
         <span className="text-xs font-bold text-wine tracking-wide uppercase">
-          Étape {currentStep} / {totalSteps}
+          {t({ fr: 'Étape', en: 'Step', nl: 'Stap' })} {currentStep} / {totalSteps}
         </span>
         <span className="text-xs text-gray-400 font-medium">
           {labels[currentStep - 1]}
@@ -67,11 +75,11 @@ export default function FormProgress({ currentStep, totalSteps, showStep5, onSte
           const clickable = onStepClick && stepNum !== currentStep
           return (
             <div
-              key={label}
+              key={i}
               className={`flex flex-col items-center gap-1 ${clickable ? 'cursor-pointer group' : ''}`}
               style={{ width: `${100 / labels.length}%` }}
               onClick={() => clickable && onStepClick(stepNum)}
-              title={clickable ? `Aller à : ${label}` : undefined}
+              title={clickable ? `${t({ fr: 'Aller à', en: 'Go to', nl: 'Ga naar' })} : ${label}` : undefined}
             >
               <div
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${

@@ -13,6 +13,7 @@ import Step7 from './steps/Step7'
 import StepConclusion from './steps/StepConclusion'
 import Step8 from './steps/Step8'
 import type { FormData } from '@/lib/types'
+import { useT } from '@/lib/i18n'
 
 const LS_KEY = 'honae_form_draft'
 
@@ -23,6 +24,8 @@ function buildSteps(showStep5: boolean) {
 
 export default function FormContainer() {
   const router = useRouter()
+  const t = useT()
+  const reqMsg = t({ fr: 'Requis', en: 'Required', nl: 'Verplicht' })
   const [currentStep, setCurrentStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -119,24 +122,24 @@ export default function FormContainer() {
     if (stepKey === 'step1') {
       const v = methods.getValues()
       if (!v.step1?.completePar) {
-        methods.setError('step1.completePar' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step1.completePar' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (!v.step1?.situationFamiliale) {
-        methods.setError('step1.situationFamiliale' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step1.situationFamiliale' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (!v.step1?.preferenceContact?.length) {
-        methods.setError('step1.preferenceContact' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step1.preferenceContact' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (!v.step1?.langue) {
-        methods.setError('step1.langue' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step1.langue' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       // Sexe du partenaire obligatoire si en couple
       if (isEnCouple && !v.step1?.partenaireSexe) {
-        methods.setError('step1.partenaireSexe' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step1.partenaireSexe' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
     }
@@ -144,7 +147,7 @@ export default function FormContainer() {
     if (stepKey === 'step3') {
       const v = methods.getValues()
       if (!v.step3?.typeContraception?.length) {
-        methods.setError('step3.typeContraception' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step3.typeContraception' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
     }
@@ -152,19 +155,19 @@ export default function FormContainer() {
     if (stepKey === 'step2') {
       const v = methods.getValues()
       if (!v.step2?.motifPrincipal) {
-        methods.setError('step2.motifPrincipal' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step2.motifPrincipal' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (!v.step2?.bilanFertilite) {
-        methods.setError('step2.bilanFertilite' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step2.bilanFertilite' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (v.step2?.motifPrincipal !== 'préservation' && !v.step2?.souhaitPreservation) {
-        methods.setError('step2.souhaitPreservation' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step2.souhaitPreservation' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
       if (!v.step2?.parcoursPMAFait) {
-        methods.setError('step2.parcoursPMAFait' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step2.parcoursPMAFait' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
     }
@@ -175,14 +178,14 @@ export default function FormContainer() {
       const v = methods.getValues()
       const nb = (v.step4 as any)?.nombreGrossesses
       if (nb === undefined || nb === null || (typeof nb === 'number' && isNaN(nb)) || nb === '') {
-        methods.setError('step4.nombreGrossesses' as any, { type: 'required', message: 'Requis' })
+        methods.setError('step4.nombreGrossesses' as any, { type: 'required', message: reqMsg })
         radioValid = false
       }
     }
 
     return textValid && radioValid
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [methods, showStep5])
+  }, [methods, showStep5, reqMsg])
 
   const next = useCallback(async () => {
     if (await validateStep(currentStep)) {
@@ -251,12 +254,20 @@ export default function FormContainer() {
     const errorStep = fields.map(stepForField).find((s): s is number => s !== null)
     if (errorStep && errorStep !== currentStep) {
       setCurrentStep(errorStep)
-      setError(`Certains champs obligatoires sont manquants à l'étape ${errorStep}. Vérifiez les champs surlignés en rouge.`)
+      setError(t({
+        fr: `Certains champs obligatoires sont manquants à l'étape ${errorStep}. Vérifiez les champs surlignés en rouge.`,
+        en: `Some required fields are missing on step ${errorStep}. Please check the fields highlighted in red.`,
+        nl: `Sommige verplichte velden ontbreken in stap ${errorStep}. Controleer de rood gemarkeerde velden.`,
+      }))
     } else {
-      setError('Certains champs obligatoires sont manquants. Vérifiez les champs surlignés en rouge.')
+      setError(t({
+        fr: 'Certains champs obligatoires sont manquants. Vérifiez les champs surlignés en rouge.',
+        en: 'Some required fields are missing. Please check the fields highlighted in red.',
+        nl: 'Sommige verplichte velden ontbreken. Controleer de rood gemarkeerde velden.',
+      }))
     }
     scrollToFirstError()
-  }, [currentStep, stepForField])
+  }, [currentStep, stepForField, t])
 
   const onSubmit = async (data: FormData) => {
     setSubmitting(true)
@@ -275,7 +286,7 @@ export default function FormContainer() {
       })
       if (!res.ok) {
         const msg = await res.text()
-        throw new Error(msg || 'Erreur lors de la soumission')
+        throw new Error(msg || t({ fr: 'Erreur lors de la soumission', en: 'Submission error', nl: 'Fout bij het verzenden' }))
       }
       await res.json()
       // sessionStorage : effacé à la fermeture de l'onglet — les données médicales
@@ -284,7 +295,7 @@ export default function FormContainer() {
       localStorage.removeItem(LS_KEY)
       router.push('/form/confirmation')
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Une erreur est survenue. Veuillez réessayer.')
+      setError(e instanceof Error ? e.message : t({ fr: 'Une erreur est survenue. Veuillez réessayer.', en: 'An error occurred. Please try again.', nl: 'Er is een fout opgetreden. Probeer het opnieuw.' }))
     } finally {
       setSubmitting(false)
     }
@@ -339,12 +350,12 @@ export default function FormContainer() {
                   disabled={currentStep === 1}
                   className="btn-secondary disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  ← Précédent
+                  ← {t({ fr: 'Précédent', en: 'Previous', nl: 'Vorige' })}
                 </button>
 
                 {currentStep < totalSteps ? (
                   <button type="button" onClick={next} className="btn-primary">
-                    Suivant →
+                    {t({ fr: 'Suivant', en: 'Next', nl: 'Volgende' })} →
                   </button>
                 ) : (
                   <button
@@ -352,7 +363,9 @@ export default function FormContainer() {
                     disabled={submitting}
                     className="btn-primary"
                   >
-                    {submitting ? 'Envoi en cours…' : 'Soumettre le formulaire'}
+                    {submitting
+                      ? t({ fr: 'Envoi en cours…', en: 'Sending…', nl: 'Verzenden…' })
+                      : t({ fr: 'Soumettre le formulaire', en: 'Submit the form', nl: 'Formulier verzenden' })}
                   </button>
                 )}
               </div>
@@ -361,7 +374,11 @@ export default function FormContainer() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-5 tracking-wide">
-          Honae Care · Données de santé protégées (RGPD) · Chiffrement AES-256
+          {t({
+            fr: 'Honae Care · Données de santé protégées (RGPD) · Chiffrement AES-256',
+            en: 'Honae Care · Protected health data (GDPR) · AES-256 encryption',
+            nl: 'Honae Care · Beschermde gezondheidsgegevens (AVG) · AES-256-versleuteling',
+          })}
         </p>
       </div>
     </div>

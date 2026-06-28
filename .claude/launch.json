@@ -5,7 +5,7 @@
       "name": "honae-dev",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "C:\\Users\\geoff\\honae-care",
+      "cwd": "C:\\Users\\geoff\\Desktop\\Projets\\honae-care",
       "port": 3000
     }
   ]
