@@ -93,13 +93,13 @@ const MenopausePDF = ({ data, date }: { data: MenopauseFormData; date: string })
         <Text style={styles.sectionTitle}>2 — Bilan &amp; antécédents médicaux</Text>
         <Field label="Bilan intégratif souhaité" value={s2?.bilanIntegratif} />
         <Field label="Bilan déjà effectué" value={s2?.bilanDejaFait} />
-        <Field label="— avec gynécologue" value={s2?.bilanGynecologue} />
-        <Field label="— avec généraliste" value={s2?.bilanGeneraliste} />
-        <Field label="— avec nutritionniste/naturopathe" value={s2?.bilanNutritionniste} />
+        <Field label="— avec gynécologue" value={s2?.bilanDejaFait === 'oui' ? s2?.bilanGynecologue : null} />
+        <Field label="— avec généraliste" value={s2?.bilanDejaFait === 'oui' ? s2?.bilanGeneraliste : null} />
+        <Field label="— avec nutritionniste/naturopathe" value={s2?.bilanDejaFait === 'oui' ? s2?.bilanNutritionniste : null} />
         <Field label="Déjà supplémentée" value={s2?.supplementee} />
-        <Field label="— hormones" value={s2?.supplHormones === 'oui' ? (s2?.supplHormonesDetail || 'Oui') : s2?.supplHormones} />
-        <Field label="— plantes" value={s2?.supplPlantes === 'oui' ? (s2?.supplPlantesDetail || 'Oui') : s2?.supplPlantes} />
-        <Field label="— compléments alimentaires" value={s2?.supplComplements === 'oui' ? (s2?.supplComplementsDetail || 'Oui') : s2?.supplComplements} />
+        <Field label="— hormones" value={s2?.supplementee === 'oui' ? (s2?.supplHormones === 'oui' ? (s2?.supplHormonesDetail || 'Oui') : s2?.supplHormones) : null} />
+        <Field label="— plantes" value={s2?.supplementee === 'oui' ? (s2?.supplPlantes === 'oui' ? (s2?.supplPlantesDetail || 'Oui') : s2?.supplPlantes) : null} />
+        <Field label="— compléments alimentaires" value={s2?.supplementee === 'oui' ? (s2?.supplComplements === 'oui' ? (s2?.supplComplementsDetail || 'Oui') : s2?.supplComplements) : null} />
         <BlockField label="Réponse aux éventuels traitements" value={s2?.reponseTraitements} />
         <Field label="Antécédents familiaux" value={arr(s2?.famAntecedents)} />
         <Field label="— cancer (précision)" value={s2?.famCancerDetail} />
@@ -130,7 +130,7 @@ const MenopausePDF = ({ data, date }: { data: MenopauseFormData; date: string })
         <Field label="Flux" value={s3?.flux} />
         <Field label="Couleur" value={s3?.couleur} />
         <Field label="Douleurs de règles" value={s3?.douleursRegles === 'oui' ? `Oui (intensité ${s3?.intensiteDouleur ?? '—'}/10)` : s3?.douleursRegles} />
-        <Field label="Localisation douleur" value={s3?.localisationDouleur} />
+        <Field label="Localisation douleur" value={s3?.douleursRegles === 'oui' ? s3?.localisationDouleur : null} />
         <Field label="Contraception (type)" value={s3?.contraceptionType} />
         <Field label="Contraception (marque)" value={s3?.contraceptionMarque} />
         <Field label="Effets secondaires" value={s3?.contraceptionEffets} />
@@ -201,7 +201,7 @@ const MenopausePDF = ({ data, date }: { data: MenopauseFormData; date: string })
         <Field label="Douleur / lourdeur au foie" value={s6?.douleurFoie} />
         <Field label="Régulation du poids difficile" value={s6?.regulationPoidsDifficile} />
         <Field label="Détresse aiguë récente" value={s6?.signalAlerte} />
-        <Field label="Souhaite en parler en consultation" value={s6?.souhaitParlerConsultation} />
+        <Field label="Souhaite en parler en consultation" value={s6?.signalAlerte === 'oui' ? s6?.souhaitParlerConsultation : null} />
 
         {/* 7 */}
         <Text style={styles.sectionTitle}>7 — Accompagnement &amp; documents</Text>
