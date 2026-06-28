@@ -11,8 +11,7 @@ const NAMES: Record<Lang, string> = {
 export default function LanguageSwitcher() {
   const { lang, setLang } = useLang()
   return (
-    <div className="flex justify-end mb-2">
-      <div className="relative">
+    <div className="relative inline-block">
         <svg
           className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-wine/70"
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
@@ -36,7 +35,6 @@ export default function LanguageSwitcher() {
         >
           <path d="M6 9l6 6 6-6" />
         </svg>
-      </div>
     </div>
   )
 }

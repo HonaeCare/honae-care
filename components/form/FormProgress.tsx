@@ -32,9 +32,12 @@ export default function FormProgress({ currentStep, totalSteps, showStep5, onSte
   const pct = Math.round(((currentStep - 1) / (totalSteps - 1)) * 100)
 
   return (
-    <div className="mb-8">
-      {/* Sélecteur de langue */}
-      <LanguageSwitcher />
+    <div className="mb-8 relative">
+      {/* Sélecteur de langue : en ligne sur mobile (évite le chevauchement),
+          flottant en haut à droite sur desktop (ne décale pas le logo) */}
+      <div className="flex justify-end mb-2 sm:mb-0 sm:absolute sm:top-0 sm:right-0 sm:z-10">
+        <LanguageSwitcher />
+      </div>
 
       {/* Logo + en-tête */}
       <div className="text-center mb-7">
