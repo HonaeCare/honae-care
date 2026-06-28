@@ -95,7 +95,7 @@ export default function Step1() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <FormField label={t({ fr: 'Couverture de soins / mutuelle', en: 'Health insurance / mutual fund', nl: 'Ziekteverzekering / mutualiteit' })} hint={facultatif}>
+        <FormField label={t({ fr: 'Couverture de soins / mutuelle', en: 'Health insurance fund', nl: 'Ziekenfonds / mutualiteit' })} hint={facultatif}>
           <input className="field-input" {...register('step1.mutuelle')} />
         </FormField>
         <FormField label={t({ fr: 'Médecin traitant', en: 'General practitioner', nl: 'Huisarts' })} hint={facultatif}>
